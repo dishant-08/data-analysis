@@ -1,9 +1,30 @@
 let assignmentIdHeader;
 
+function mostUsedWord(data){
+  const jargons = data;
+  const jargonCounts = {};
+  const mostUsedJargon = new Map()
+  // Step 2: Calculate word counts
+
+  jargons.forEach((jargon) => {
+    mostUsedJargon.set(jargon , (mostUsedJargon.get(jargon) || 0) + 1);
+  });
+  let maxCount = Math.max(...mostUsedJargon.values())
+// console.log(maxCount);
+let i =0 
+for(let max of mostUsedJargon.keys()){
+    if(mostUsedJargon.get(max) === maxCount){
+        jargonCounts[i++] = (max)
+    }
+}
+  // console.log(jargonCounts);
+  return jargonCounts;
+}
+
 // Step 1: Fetch data and assignment ID
 fetch('https://one00x-data-analysis.onrender.com/assignment?email=dishant.sahu07@gmail.com')
   .then((res) => {
-    if (res.status === 200) {
+    if (res.ok) {
       assignmentIdHeader = res.headers.get('x-assignment-id'); // Corrected variable name
       return res.json();
     } else {
@@ -11,26 +32,15 @@ fetch('https://one00x-data-analysis.onrender.com/assignment?email=dishant.sahu07
     }
   })
   .then((data) => {
-    const jargons = data;
-    const jargonCounts = {};
-
-    // Step 2: Calculate word counts
-    jargons.forEach((jargon) => {
-      jargonCounts[jargon] = (jargonCounts[jargon] || 0) + 1;
-    });
-
-    // Step 3: Find the most used jargon
-    const mostUsedJargon = Object.keys(jargonCounts).reduce((a, b) => {
-      return jargonCounts[a] > jargonCounts[b] ? a : b;
-    });
+   
 
     // Step 4: Prepare and submit the answer
     const requestData = {
       
       assignment_id: assignmentIdHeader, 
-      answer: mostUsedJargon,
+      answer: (mostUsedWord(data)[0]),
     };
-    // console.log(requestData);
+    console.log(requestData);
 
     // Step 5: Submit the answer
     return fetch('https://one00x-data-analysis.onrender.com/assignment', {
@@ -42,7 +52,7 @@ fetch('https://one00x-data-analysis.onrender.com/assignment?email=dishant.sahu07
     });
   })
   .then((response) => {
-    if (response.status === 200) {
+    if (response.ok) {
       return response.json();
     } else {
       throw new Error('Failed to submit the answer');
